@@ -20,11 +20,7 @@ def Prompt():
         return jsonify({"error": "No prompt sent"}), 400
 
     question = f"Please answer the following prompt in less than five sentences: {prompt}."
-    genai.configure(
-        vertex_ai_project="berkheiser-cis693",
-        vertex_ai_location="us-central1"
-    )
-    client = genai.Client()
+    client = genai.Client(vertexai=True, project="my-gcp-project", location="us-central1")
 
     response = client.models.generate_content(
         model="gemini-2.0-flash-001",
