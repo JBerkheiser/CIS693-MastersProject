@@ -1,7 +1,7 @@
 steps:
 - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
   entrypoint: 'bash'
-  args: ['-c', 'gcloud app deploy --account=automated-build-account@berkheiser-cis693.iam.gserviceaccount.com ./source/app.yaml']
+  args: ['-c', 'gcloud app deploy --account=automated-build-account@berkheiser-cis693.iam.gserviceaccount.com ./source/backend/app.yaml']
   timeout: '1600s'
 options:
   logging: CLOUD_LOGGING_ONLY
