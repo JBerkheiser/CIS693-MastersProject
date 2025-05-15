@@ -1,6 +1,13 @@
 from flask import Flask, jsonify, request
 from flask_cors import CORS
-from vertexai.generative_models import GenerativeModel
+from google import genai
+from google.genai.types import (
+    GenerateContentConfig,
+    GoogleSearch,
+    HttpOptions,
+    Tool,
+)
+
 app = Flask(__name__)
 CORS(app)
 
@@ -8,13 +15,22 @@ CORS(app)
 def Prompt():
     if "prompt" not in request.get_json():
         return jsonify({"error": "No prompt sent"}), 400
-    prompt = request.get_json()
+    prompt = request.get_json().get("prompt", "")
     if prompt == "":
         return jsonify({"error": "No prompt sent"}), 400
 
-    model = GenerativeModel("gemini-2.5-pro-exp-03-25")
-    question = f"Please answer the following prompt in less than five sentences: ${prompt}."
-    response = model.generate_content([question])
+    question = f"Please answer the following prompt in less than five sentences: {prompt}."
+    client = genai.Client(http_options=HttpOptions(api_version="v1"))
+
+    response = client.models.generate_content(
+        model="gemini-2.0-flash-001",
+        contents=question,
+        config=GenerateContentConfig(
+            tools=[
+                Tool(google_search=GoogleSearch())
+            ],
+        ),
+    )
     return jsonify({"Response": response.text})
 
 
