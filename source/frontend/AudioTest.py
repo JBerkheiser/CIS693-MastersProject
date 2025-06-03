@@ -1,6 +1,9 @@
 from gpiozero import Button
+from datetime import datetime
 import os
 
 button = Button(27)
 button.wait_for_press()
-print("The button was pressed")
+date = datetime.now().strftime("%d_%m_%Y-%H:%M:%S")
+print("The button was pressed, recording")
+os.system(f'arecord --format S16_LE --duration=5 --rate 48000 -c2 /home/joseberk/CIS693-MastersProject/testSounds/{date}.wav')
