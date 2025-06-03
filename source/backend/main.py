@@ -1,6 +1,7 @@
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 from google import genai
+from google.cloud import speech
 from google.genai.types import (
     GenerateContentConfig,
     GoogleSearch,
@@ -13,25 +14,44 @@ CORS(app)
 
 @app.route("/prompt", methods=["POST"])
 def Prompt():
-    if "prompt" not in request.get_json():
-        return jsonify({"error": "No prompt sent"}), 400
-    prompt = request.get_json().get("prompt", "")
-    if prompt == "":
-        return jsonify({"error": "No prompt sent"}), 400
-
-    question = f"Please answer the following prompt in less than five sentences: {prompt}."
-    client = genai.Client(vertexai=True, project="berkheiser-cis693", location="us-central1")
-
-    response = client.models.generate_content(
-        model="gemini-2.0-flash-001",
-        contents=question,
-        config=GenerateContentConfig(
-            tools=[
-                Tool(google_search=GoogleSearch())
-            ],
-        ),
+    if "prompt" not in request.files:
+        return jsonify({"error": "No audio file sent"}), 400
+    audioFile = request.files["prompt"]
+    if audioFile == "":
+        return jsonify({"error": "No audio file sent"}), 400
+    
+    speechClient = speech.SpeechClient()
+    config = speech.RecognitionConfig(
+        sample_rate_hertz=48000,
+        language_code="en-US",
+        model="latest_short"
     )
-    return jsonify({"Response": response.text})
+    audio = speech.RecognitionAudio(content=audioFile.read())
+    
+    operation = speechClient.long_running_recognize(config=config, audio=audio)
+    print("Transcribing audio input...")
+    response = operation.result(timeout=90)
+
+    for i, result in enumerate(response.results):
+        alternative = result.alternatives[0]
+        print("-" * 20)
+        print(f"First alternative of result {i}")
+        print(f"Transcript: {alternative.transcript}")
+
+    # question = f"Please answer the following prompt in less than five sentences: {prompt}."
+    # client = genai.Client(vertexai=True, project="berkheiser-cis693", location="us-central1")
+
+    # response = client.models.generate_content(
+    #     model="gemini-2.0-flash-001",
+    #     contents=question,
+    #     config=GenerateContentConfig(
+    #         tools=[
+    #             Tool(google_search=GoogleSearch())
+    #         ],
+    #     ),
+    # )
+    # return jsonify({"Response": response.text})
+    return jsonify({"Response": response.results.alternatives[0].transcript})
 
 
 if __name__ == "__main__":

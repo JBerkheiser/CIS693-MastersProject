@@ -2,3 +2,4 @@ Flask==3.0.2
 flask-cors
 requests
 google-genai
+google-cloud-speech
