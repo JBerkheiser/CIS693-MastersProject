@@ -5,4 +5,5 @@ url = "https://berkheiser-cis693.uk.r.appspot.com/prompt"
 
 files = {"prompt": open(File, 'rb')}
 response = requests.post(url, files=files)
+print(response)
 

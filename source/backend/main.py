@@ -25,6 +25,7 @@ def Prompt():
         sample_rate_hertz=48000,
         language_code="en-US",
         model="latest_short"
+        audio_channel_count=2,
     )
     audio = speech.RecognitionAudio(content=audioFile.read())
     
