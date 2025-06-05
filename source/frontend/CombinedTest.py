@@ -13,5 +13,5 @@ os.system(f'arecord -D hw:0,0 --format S16_LE --duration=5 --rate 48000 -c2 /hom
 
 files = {"prompt": open(f'/home/joseberk/CIS693-MastersProject/testSounds/{date}.wav', 'rb')}
 response = requests.post(url, files=files)
-print(response.Response)
+print(response.json()["Response"])
 
