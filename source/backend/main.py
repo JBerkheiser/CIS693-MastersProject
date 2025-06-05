@@ -42,6 +42,7 @@ def Prompt():
         prompt = alternative.transcript
 
     question = f"Please answer the following prompt in less than five sentences: {prompt}."
+    print(f"Question: {question}")
     client = genai.Client(vertexai=True, project="berkheiser-cis693", location="us-central1")
 
     response = client.models.generate_content(
@@ -53,6 +54,8 @@ def Prompt():
             ],
         ),
     )
+
+    print(f"Response: {response.text}")
     return jsonify({"Response": response.text})
 
 
