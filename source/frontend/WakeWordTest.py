@@ -19,14 +19,20 @@ bytesPerSample = 2
 channels = 2
 
 while True:
-	handle = pvporcupine.create(access_key=accessKey, keyword_paths=[keyWordPath])
+	handle = pvporcupine.create(
+		access_key=accessKey, 
+		keyword_paths=[keyWordPath],
+		keywords=['bumblebee']
+		)
 	frameLength = handle.frame_length
 	process = subprocess.Popen(['arecord', '-D',  'hw:0,0', '-f', 'S16_LE', '-r', '16000', '-c', '2', '-t', 'raw'], stdout=subprocess.PIPE)
 	while True:
 		keywordIndex = handle.process(get_next_audio_frame())
-		if keywordIndex >= 0:
-			print("Heard the word")
+		if keywordIndex == 0:
+			print("Recording a query")
 			break
+		elif keywordIndex == 1:
+			print("Taking a photo")
 	time.sleep(1)
 	process.kill()
 	subprocess.call("/home/joseberk/CIS693-MastersProject/source/frontend/CombinedTest.py")
