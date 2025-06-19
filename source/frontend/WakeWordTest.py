@@ -18,6 +18,7 @@ file.close()
 
 bytesPerSample = 2
 channels = 2
+script = ""
 
 while True:
 	handle = pvporcupine.create(
@@ -30,10 +31,12 @@ while True:
 		keywordIndex = handle.process(get_next_audio_frame())
 		if keywordIndex == 0:
 			print("Recording a query")
+			script = "/home/joseberk/CIS693-MastersProject/source/frontend/CombinedTest.py"
 			break
 		elif keywordIndex == 1:
 			print("Taking a photo")
+			script = "/home/joseberk/CIS693-MastersProject/source/frontend/CameraTest.py"
 	time.sleep(1)
 	process.kill()
-	subprocess.call("/home/joseberk/CIS693-MastersProject/source/frontend/CombinedTest.py")
+	subprocess.call(script)
 	handle.delete()
