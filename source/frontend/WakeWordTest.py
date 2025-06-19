@@ -36,6 +36,7 @@ while True:
 		elif keywordIndex == 1:
 			print("Taking a photo")
 			script = "/home/joseberk/CIS693-MastersProject/source/frontend/CameraTest.py"
+			break
 	time.sleep(1)
 	process.kill()
 	subprocess.call(script)
