@@ -61,13 +61,13 @@ def Prompt():
 
 @app.route("/photo", methods=["POST"])
 def Photo():
-    rawData = ""
     if "rawData" not in request.files:
         return jsonify({"error": "No image file sent"}), 400
     imageBytes = request.files["rawData"]
     if imageBytes == "":
         return jsonify({"error": "No image file sent"}), 400
     
+    print(f"Image bytes: {imageBytes}")
     question = f"Describe the following image in less than five sentences."
     print(f"Question: {question}")
     client = genai.Client(vertexai=True, project="berkheiser-cis693", location="us-central1")
