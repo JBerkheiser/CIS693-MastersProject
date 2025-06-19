@@ -63,7 +63,7 @@ def Prompt():
 def Photo():
     if "rawData" not in request.files:
         return jsonify({"error": "No image file sent"}), 400
-    imageBytes = request.files["rawData"]
+    imageBytes = request.files["rawData"].read()
     if imageBytes == "":
         return jsonify({"error": "No image file sent"}), 400
     
