@@ -10,7 +10,8 @@ def get_next_audio_frame():
 	rightChannel = samples[1::2]
 	return rightChannel
 
-keyWordPath = "/home/joseberk/CIS693-MastersProject/includes/porcupine/Hey-Torkelson_en_raspberry-pi_v3_0_0.ppn"
+keyWord1Path = "/home/joseberk/CIS693-MastersProject/includes/porcupine/Hey-Torkelson_en_raspberry-pi_v3_0_0.ppn"
+keyWord2Path = "/home/joseberk/CIS693-MastersProject/includes/porcupine/jarvis_raspberry-pi.ppn"
 file = open("/home/joseberk/CIS693-MastersProject/includes/porcupine/PorcupineAccessKey.txt", "r")
 accessKey = file.read()
 file.close()
@@ -21,8 +22,7 @@ channels = 2
 while True:
 	handle = pvporcupine.create(
 		access_key=accessKey, 
-		keyword_paths=[keyWordPath],
-		keywords=['bumblebee']
+		keyword_paths=[keyWord1Path, keyWord2Path],
 		)
 	frameLength = handle.frame_length
 	process = subprocess.Popen(['arecord', '-D',  'hw:0,0', '-f', 'S16_LE', '-r', '16000', '-c', '2', '-t', 'raw'], stdout=subprocess.PIPE)
