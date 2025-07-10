@@ -17,7 +17,7 @@ CORS(app)
 
 def convertToAudio(textResponse):
 
-    client = genai.Client(vertexai=True, project="berkheiser-cis693", location="us-central1")
+    client = genai.Client(api_key="AIzaSyAcBltM2deVyB61RXukEqgobcaKn0H-Jwg")
     audioResponse = client.models.generate_content(
         model = "gemini-2.5-flash-preview-tts",
         contents = textResponse,
