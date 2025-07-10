@@ -5,6 +5,8 @@ from google.cloud import speech
 from google.genai import types
 from google.genai.types import (
     GenerateContentConfig,
+    SpeechConfig,
+    VoiceConfig,
     GoogleSearch,
     HttpOptions,
     Tool,
@@ -12,6 +14,28 @@ from google.genai.types import (
 
 app = Flask(__name__)
 CORS(app)
+
+def convertToAudio(textResponse):
+
+    client = genai.Client()
+    audioResponse = client.models.generate_content(
+        model = "gemini-2.5-flash-preview-tts",
+        contents = textResponse,
+        config = types.GenerateContentConfig(
+            response_modalities = ["AUDIO"],
+            speech_config = types.SpeechConfig(
+                voice_config = types.VoiceConfig(
+                    prebuilt_voice_config = types.PrebuiltVoiceConfig(
+                        voice_name = 'Rasalgethi',
+                    )
+                )
+            ),
+        )
+    )
+
+    encodedAudio = audioResponse.candidates[0].content.parts[0].inline_data.data
+
+    return encodedAudio
 
 @app.route("/prompt", methods=["POST"])
 def Prompt():
@@ -57,7 +81,9 @@ def Prompt():
     )
 
     print(f"Response: {response.text}")
-    return jsonify({"Response": response.text})
+
+    audioResponse = convertToAudio(response.text)
+    return jsonify({"textResponse": response.text, "audioResponse": audioResponse})
 
 @app.route("/photo", methods=["POST"])
 def Photo():
