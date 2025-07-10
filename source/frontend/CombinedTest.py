@@ -23,6 +23,6 @@ files = {"prompt": open(f'/home/joseberk/CIS693-MastersProject/testSounds/{date}
 response = requests.post(url, files=files)
 print(response.json()["textResponse"])
 decodeAudio(response.json()["audioResponse"])
-os.system('aplay -D hw:0,0 /home/joseberk/CIS693-MastersProject/testResponseAudio/response.wav')
+os.system('aplay -D hw:0,0 -c2 /home/joseberk/CIS693-MastersProject/testResponseAudio/response.wav')
 
 

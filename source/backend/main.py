@@ -35,8 +35,10 @@ def convertToAudio(textResponse):
     )
 
     encodedAudio = audioResponse.candidates[0].content.parts[0].inline_data.data
+    print(F"ENCODED AUDIO: {encodedAudio}")
     pcmBytes = base64.b64decode(encodedAudio)
     encodedForJSON = base64.b64encode(pcmBytes).decode('utf-8')
+    print(F"ENCODED AUDIO FOR JSON: {encodedForJSON}")
     return encodedForJSON
 
 @app.route("/prompt", methods=["POST"])
