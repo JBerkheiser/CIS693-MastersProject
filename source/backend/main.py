@@ -11,6 +11,7 @@ from google.genai.types import (
     HttpOptions,
     Tool,
 )
+import base64
 
 app = Flask(__name__)
 CORS(app)
@@ -34,8 +35,9 @@ def convertToAudio(textResponse):
     )
 
     encodedAudio = audioResponse.candidates[0].content.parts[0].inline_data.data
-
-    return encodedAudio
+    pcmBytes = base64.b64decode(encodedAudio)
+    encodedForJSON = base64.b64encode(pcmBytes).decode('utf-8')
+    return encodedForJSON
 
 @app.route("/prompt", methods=["POST"])
 def Prompt():
