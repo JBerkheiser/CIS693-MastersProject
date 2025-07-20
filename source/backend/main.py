@@ -81,7 +81,7 @@ def Prompt():
         print(f"Transcript: {alternative.transcript}")
         prompt = alternative.transcript
 
-    question = f"Please answer the following prompt in less than five sentences: {prompt}."
+    question = f"Please answer the following prompt in less than five sentences, and without any punctuation beyond periods: {prompt}."
     print(f"Question: {question}")
     client = genai.Client(vertexai=True, project="berkheiser-cis693", location="us-central1")
 

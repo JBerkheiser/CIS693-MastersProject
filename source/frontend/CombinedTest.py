@@ -7,7 +7,7 @@ import wave
 import base64
 
 def getAudio(audioURL, date):
-    output_path = f"/home/joseberk/CIS693-MastersProject/testSounds/{date}.wav'"
+    output_path = f"/home/joseberk/CIS693-MastersProject/testResponseAudio/{date}.wav'"
     audio = requests.get(audioURL)
     if audio.ok:
         with open(output_path, "wb") as f:
