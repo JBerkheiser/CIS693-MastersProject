@@ -21,7 +21,7 @@ CORS(app)
 
 def accessSecretVersion(projectID, secretID, versionID) -> secretmanager.AccessSecretVersionResponse:
     client = secretmanager.SecretManagerServiceClient()
-    name = f"projects/{projectID}/service/{secretID}/version/{versionID}"
+    name = f"projects/{projectID}/secrets/{secretID}/versions/{versionID}"
 
     response = client.access_secret_version(request={"name":name})
 
@@ -35,7 +35,7 @@ def accessSecretVersion(projectID, secretID, versionID) -> secretmanager.AccessS
     return payload
 
 def convertToAudio(textResponse):
-    api_token = accessSecretVersion("berkheiser-cis693", "TextToSpeechAPIKey", "1")
+    api_token = accessSecretVersion("848154742223", "TextToSpeechAPIKey", "1")
     Resemble.api_key(api_token)
 
     response = Resemble.v2.clips.create_sync(
