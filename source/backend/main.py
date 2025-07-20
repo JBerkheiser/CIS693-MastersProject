@@ -2,6 +2,7 @@ from flask import Flask, jsonify, request
 from flask_cors import CORS
 from google import genai
 from google.cloud import speech
+from google.cloud import secretmanager
 from google.genai import types
 from google.genai.types import (
     GenerateContentConfig,
@@ -12,34 +13,44 @@ from google.genai.types import (
     Tool,
 )
 import base64
+from resemble import Resemble
+import google_crc32c
 
 app = Flask(__name__)
 CORS(app)
 
+def accessSecretVersion(projectID, secretID, versionID) -> secretmanager.AccessSecretVersionResponse:
+    client = secretmanager.SecretManagerServiceClient()
+    name = f"projects/{projectID}/service/{secretID}/version/{versionID}"
+
+    response = client.access_secret_version(request={"name":name})
+
+    crc32c = google_crc32c.Checksum()
+    crc32c.update(response.payload.data)
+    if response.payload.data_crc32c != int(crc32c.hexdigest(), 16):
+        print("Data corruption detected.")
+        return response
+
+    payload = response.payload.data.decode("UTF-8")
+    return payload
+
 def convertToAudio(textResponse):
+    api_token = accessSecretVersion("berkheiser-cis693", "TextToSpeechAPIKey", "1")
+    Resemble.api_key(api_token)
 
-    client = genai.Client(api_key="AIzaSyAcBltM2deVyB61RXukEqgobcaKn0H-Jwg")
-    audioResponse = client.models.generate_content(
-        model = "gemini-2.5-flash-preview-tts",
-        contents = textResponse,
-        config = types.GenerateContentConfig(
-            response_modalities = ["AUDIO"],
-            speech_config = types.SpeechConfig(
-                voice_config = types.VoiceConfig(
-                    prebuilt_voice_config = types.PrebuiltVoiceConfig(
-                        voice_name = 'Rasalgethi',
-                    )
-                )
-            ),
-        )
+    response = Resemble.v2.clips.create_sync(
+        project_uuid='89e0ea27',
+        voice_uuid='55592656',
+        body=textResponse,
+        is_archived=None,
+        title=None,
+        sample_rate=None,
+        output_format=None,
+        precision=None,
+        include_timestamps=None,
+        raw=None
     )
-
-    encodedAudio = audioResponse.candidates[0].content.parts[0].inline_data.data
-    print(F"ENCODED AUDIO: {encodedAudio}")
-    pcmBytes = base64.b64decode(encodedAudio)
-    encodedForJSON = base64.b64encode(pcmBytes).decode('utf-8')
-    print(F"ENCODED AUDIO FOR JSON: {encodedForJSON}")
-    return encodedForJSON
+    return response['audio_src']
 
 @app.route("/prompt", methods=["POST"])
 def Prompt():
@@ -86,8 +97,8 @@ def Prompt():
 
     print(f"Response: {response.text}")
 
-    audioResponse = convertToAudio(response.text)
-    return jsonify({"textResponse": response.text, "audioResponse": audioResponse})
+    audioURL = convertToAudio(response.text)
+    return jsonify({"textResponse": response.text, "audioResponse": audioURL})
 
 @app.route("/photo", methods=["POST"])
 def Photo():

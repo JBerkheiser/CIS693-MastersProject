@@ -6,13 +6,15 @@ import requests
 import wave
 import base64
 
-def decodeAudio(encodedAudio):
-    PCMBytes = base64.b64decode(encodedAudio)
-    with wave.open("/home/joseberk/CIS693-MastersProject/testResponseAudio/response.wav", "wb") as wf:
-        wf.setnchannels(1)
-        wf.setsampwidth(2)
-        wf.setframerate(24000)
-        wf.writeframes(PCMBytes)
+def getAudio(audioURL, date):
+    output_path = f"/home/joseberk/CIS693-MastersProject/testSounds/{date}.wav'"
+    audio = requests.get(audioURL)
+    if audio.ok:
+        with open(output_path, "wb") as f:
+            f.write(audio.content)
+        print(f"Audio downloaded and saved as {output_path}")
+    else:
+        print("Failed to download audio:", audio.status_code)
 
 
 url = "https://berkheiser-cis693.uk.r.appspot.com/prompt"
@@ -22,7 +24,7 @@ os.system(f'arecord -D hw:0,0 --format S16_LE --duration=3 --rate 48000 -c2 /hom
 files = {"prompt": open(f'/home/joseberk/CIS693-MastersProject/testSounds/{date}.wav', 'rb')}
 response = requests.post(url, files=files)
 print(response.json()["textResponse"])
-decodeAudio(response.json()["audioResponse"])
-os.system('aplay -D hw:0,0 -c2 /home/joseberk/CIS693-MastersProject/testResponseAudio/response.wav')
+getAudio(response.json()["audioResponse"], date)
+os.system(f'aplay -D hw:0,0 -c2 /home/joseberk/CIS693-MastersProject/testResponseAudio/{date}.wav')
 
 
