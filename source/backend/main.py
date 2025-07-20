@@ -50,7 +50,7 @@ def convertToAudio(textResponse):
         include_timestamps=None,
         raw=None
     )
-    return response['audio_src']
+    return response['item']['audio_src']
 
 @app.route("/prompt", methods=["POST"])
 def Prompt():
