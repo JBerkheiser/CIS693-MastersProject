@@ -4,3 +4,4 @@ requests
 google-genai
 google-cloud-speech
 google-cloud-secret-manager
+resemble
