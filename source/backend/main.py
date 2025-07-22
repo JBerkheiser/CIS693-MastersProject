@@ -81,7 +81,7 @@ def Prompt():
         print(f"Transcript: {alternative.transcript}")
         prompt = alternative.transcript
 
-    question = f"Please answer the following prompt in less than five sentences, and without any punctuation beyond periods: {prompt}."
+    question = f"Please answer the following prompt in less than five sentences, and with only alpha-numeric characters and periods: {prompt}."
     print(f"Question: {question}")
     client = genai.Client(vertexai=True, project="berkheiser-cis693", location="us-central1")
 
@@ -109,7 +109,7 @@ def Photo():
         return jsonify({"error": "No image file sent"}), 400
     
     print(f"Image bytes: {imageBytes}")
-    question = f"Describe the following image in less than five sentences."
+    question = f"Describe the following image in less than five sentences, and with only alpha-numeric characters and periods."
     print(f"Question: {question}")
     client = genai.Client(vertexai=True, project="berkheiser-cis693", location="us-central1")
 
@@ -130,7 +130,8 @@ def Photo():
     )
 
     print(f"Response: {response.text}")
-    return jsonify({"Response": response.text})
+    audioURL = convertToAudio(response.text)
+    return jsonify({"Response": response.text, "audioResponse": audioURL})
 
 
 if __name__ == "__main__":
