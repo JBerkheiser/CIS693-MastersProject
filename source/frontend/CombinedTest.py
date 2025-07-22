@@ -7,7 +7,7 @@ import wave
 import base64
 
 def getAudio(audioURL, date):
-    output_path = f"/home/joseberk/CIS693-MastersProject/testResponseAudio/{date}.wav'"
+    output_path = f"/home/joseberk/CIS693-MastersProject/testResponseAudio/{date}.wav"
     audio = requests.get(audioURL)
     if audio.ok:
         with open(output_path, "wb") as f:
@@ -25,6 +25,7 @@ files = {"prompt": open(f'/home/joseberk/CIS693-MastersProject/testSounds/{date}
 response = requests.post(url, files=files)
 print(response.json()["textResponse"])
 getAudio(response.json()["audioResponse"], date)
-os.system(f'aplay -D hw:0,0 -c2 /home/joseberk/CIS693-MastersProject/testResponseAudio/{date}.wav')
+os.system(f'ffmpeg -i /home/joseberk/CIS693-MastersProject/testResponseAudio/{date}.wav -ar 44100 -ac 2 -sample_fmt s16 /home/joseberk/CIS693-MastersProject/testResponseAudio/playableAudio.wav')
+os.system(f'aplay -D hw:0,0 -c2 /home/joseberk/CIS693-MastersProject/testResponseAudio/playableAudio.wav')
 
 
