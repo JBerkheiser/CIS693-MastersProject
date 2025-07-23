@@ -175,7 +175,6 @@ def main():
                         if "textResponse" not in responseData or "audioResponse" not in responseData:
                             raise KeyError(f"Missing keys in response: {responseData.keys()}")
 
-                        print(f"RESPONSE: {responseData["textResponse"]}")
                         downloadAudio(responseData["audioResponse"], date)
 
                 except requests.exceptions.RequestException as e:
