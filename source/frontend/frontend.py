@@ -181,10 +181,12 @@ def main():
                 if not errorCatch(f'{PLAYBACK_COMMAND}{date}PLAYABLE.wav', "Audio playback"):
                     state = States.ERROR
                     continue
+                state = States.WAKE_WORD
 
             case _:
                 print("CURRENT STATE: ERROR")
                 # Play Error Message
+                state = States.WAKE_WORD
                 continue
 
 if __name__ == "__main__":
