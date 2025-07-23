@@ -175,7 +175,7 @@ def main():
                         if "textResponse" not in responseData or "audioResponse" not in responseData:
                             raise KeyError(f"Missing keys in response: {responseData.keys()}")
 
-                        print(responseData["Response"])
+                        print(f"RESPONSE: {responseData["textResponse"]}")
                         downloadAudio(responseData["audioResponse"], date)
 
                 except requests.exceptions.RequestException as e:
@@ -189,6 +189,7 @@ def main():
                 except Exception as e:
                     print(f"[ERROR] Unexpected backend communication error: {e}")
                     state = States.ERROR
+
                 state = States.WAKE_WORD
 
             case _:
