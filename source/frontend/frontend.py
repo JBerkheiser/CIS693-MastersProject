@@ -188,6 +188,13 @@ def main():
                 except Exception as e:
                     print(f"[ERROR] Unexpected backend communication error: {e}")
                     state = States.ERROR
+                
+                if not errorCatch(f'{CONVERT_COMMAND_INPUT}{date}.wav {CONVERT_COMMAND_OUTPUT}{date}PLAYABLE.wav', "Audio conversion"):
+                    state = States.ERROR
+                    continue
+                if not errorCatch(f'{PLAYBACK_COMMAND}{date}PLAYABLE.wav', "Audio playback"):
+                    state = States.ERROR
+                    continue
 
                 state = States.WAKE_WORD
 
