@@ -168,19 +168,27 @@ def main():
                         files = {jsonHeader: f}
                         response = requests.post(url, files=files)
                         response.raise_for_status()
-                        print(response.json()["Response"])
-                        downloadAudio(response.json()["audioResponse"], date)
-                except Exception as e:
-                    print(f"[ERROR] Backend communication failed: {e}")
-                    state = States.ERROR
-                    continue
 
-                if not errorCatch(f'{CONVERT_COMMAND_INPUT}{date}.wav {CONVERT_COMMAND_OUTPUT}{date}PLAYABLE.wav', "Audio conversion"):
+                        responseData = response.json()
+                        print("Full Response JSON:", responseData)
+
+                        if "Response" not in responseData or "audioResponse" not in responseData:
+                            raise KeyError(f"Missing keys in response: {responseData.keys()}")
+
+                        print(responseData["Response"])
+                        downloadAudio(responseData["audioResponse"], date)
+
+                except requests.exceptions.RequestException as e:
+                    print(f"[ERROR] HTTP request failed: {e}")
                     state = States.ERROR
-                    continue
-                if not errorCatch(f'{PLAYBACK_COMMAND}{date}PLAYABLE.wav', "Audio playback"):
+
+                except KeyError as e:
+                    print(f"[ERROR] Expected key missing from response: {e}")
                     state = States.ERROR
-                    continue
+
+                except Exception as e:
+                    print(f"[ERROR] Unexpected backend communication error: {e}")
+                    state = States.ERROR
                 state = States.WAKE_WORD
 
             case _:
