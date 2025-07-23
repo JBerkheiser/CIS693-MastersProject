@@ -172,7 +172,7 @@ def main():
                         responseData = response.json()
                         print("Full Response JSON:", responseData)
 
-                        if "Response" not in responseData or "audioResponse" not in responseData:
+                        if "textResponse" not in responseData or "audioResponse" not in responseData:
                             raise KeyError(f"Missing keys in response: {responseData.keys()}")
 
                         print(responseData["Response"])

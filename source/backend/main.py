@@ -131,7 +131,7 @@ def Photo():
 
     print(f"Response: {response.text}")
     audioURL = convertToAudio(response.text)
-    return jsonify({"Response": response.text, "audioResponse": audioURL})
+    return jsonify({"textResponse": response.text, "audioResponse": audioURL})
 
 
 if __name__ == "__main__":
