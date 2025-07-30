@@ -49,6 +49,7 @@ CONVERT_COMMAND_OUTPUT = f"-ar {OUTPUT_RATE} -ac {OUTPUT_CHANNELS} -sample_fmt {
 PLAYBACK_COMMAND = f"aplay -D {HARDWARE} -c2 {PROJECT_PATH}/testResponseAudio/"
 PLAY_START_AUDIO = f"aplay -D {HARDWARE} -c2 {PROJECT_PATH}/playableAudio/StartingAudio.wav"
 PLAY_ERROR_AUDIO = f"aplay -D {HARDWARE} -c2 {PROJECT_PATH}/playableAudio/ErrorAudio.wav"
+PLAY_LISTENING_AUDIO = f"aplay -D {HARDWARE} -c2 {PROJECT_PATH}/playableAudio/ListeningAudio.wav"
 PHOTO_COMMAND = f"rpicam-jpeg --output {PROJECT_PATH}/testPics/"
 
 ###############################################################
@@ -150,6 +151,9 @@ def main():
             case States.QUERY_PROMPT:
                 print("CURRENT STATE: QUERY_PROMPT")
                 dataPath = f"{PROJECT_PATH}/testSounds/{date}.wav"
+                if not errorCatch(f'{PLAY_LISTENING_AUDIO}', "Audio playback"):
+                    state = States.ERROR
+                    continue
                 if not errorCatch(f"{RECORD_COMMAND}{date}.wav", "Audio recording"):
                     state = States.ERROR
                     continue
