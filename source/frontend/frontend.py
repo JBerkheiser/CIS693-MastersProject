@@ -124,7 +124,7 @@ def waitForWakeWord():
 ###############################################################
 def main():
     state = States.WAKE_WORD
-    date = datetime.now().strftime("%d-%m-%Y_%H-%M-%S")
+    date = ""
     url = ""
     dataPath = ""
     jsonHeader = ""
@@ -133,6 +133,10 @@ def main():
         match state:
             case States.WAKE_WORD:
                 print("CURRENT STATE: WAKE_WORD")
+                date = datetime.now().strftime("%d-%m-%Y_%H-%M-%S")
+                if not errorCatch(f'{PLAYBACK_COMMAND}StartingSound.wav', "Audio playback"):
+                    state = States.ERROR
+                    continue
                 match waitForWakeWord():
                     case "Query":
                         state = States.QUERY_PROMPT
@@ -200,7 +204,9 @@ def main():
 
             case _:
                 print("CURRENT STATE: ERROR")
-                # Play Error Message
+                if not errorCatch(f'{PLAYBACK_COMMAND}ErrorSound.wav', "Audio playback"):
+                    state = States.ERROR
+                    continue
                 state = States.WAKE_WORD
                 continue
 
