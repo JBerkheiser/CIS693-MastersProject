@@ -47,6 +47,8 @@ RECORD_COMMAND = f"arecord -D {HARDWARE} --format {INPUT_FORMAT} --duration {REC
 CONVERT_COMMAND_INPUT = f"ffmpeg -i {PROJECT_PATH}/testResponseAudio/"
 CONVERT_COMMAND_OUTPUT = f"-ar {OUTPUT_RATE} -ac {OUTPUT_CHANNELS} -sample_fmt {OUTPUT_FORMAT} {PROJECT_PATH}/testResponseAudio/"
 PLAYBACK_COMMAND = f"aplay -D {HARDWARE} -c2 {PROJECT_PATH}/testResponseAudio/"
+PLAY_START_AUDIO = f"aplay -D {HARDWARE} -c2 {PROJECT_PATH}/playableAudio/StartingAudio.wav"
+PLAY_ERROR_AUDIO = f"aplay -D {HARDWARE} -c2 {PROJECT_PATH}/playableAudio/ErrorAudio.wav"
 PHOTO_COMMAND = f"rpicam-jpeg --output {PROJECT_PATH}/testPics/"
 
 ###############################################################
@@ -134,7 +136,7 @@ def main():
             case States.WAKE_WORD:
                 print("CURRENT STATE: WAKE_WORD")
                 date = datetime.now().strftime("%d-%m-%Y_%H-%M-%S")
-                if not errorCatch(f'{PLAYBACK_COMMAND}StartingAudio.wav', "Audio playback"):
+                if not errorCatch(f'{PLAY_START_AUDIO}', "Audio playback"):
                     state = States.ERROR
                     continue
                 match waitForWakeWord():
@@ -204,10 +206,11 @@ def main():
 
             case _:
                 print("CURRENT STATE: ERROR")
-                if not errorCatch(f'{PLAYBACK_COMMAND}ErrorAudio.wav', "Audio playback"):
+                if not errorCatch(f'{PLAY_ERROR_AUDIO}', "Audio playback"):
                     state = States.ERROR
                     continue
                 state = States.WAKE_WORD
+                time.sleep(10)
                 continue
 
 if __name__ == "__main__":
