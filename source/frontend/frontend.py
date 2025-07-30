@@ -134,7 +134,7 @@ def main():
             case States.WAKE_WORD:
                 print("CURRENT STATE: WAKE_WORD")
                 date = datetime.now().strftime("%d-%m-%Y_%H-%M-%S")
-                if not errorCatch(f'{PLAYBACK_COMMAND}StartingSound.wav', "Audio playback"):
+                if not errorCatch(f'{PLAYBACK_COMMAND}StartingAudio.wav', "Audio playback"):
                     state = States.ERROR
                     continue
                 match waitForWakeWord():
@@ -204,7 +204,7 @@ def main():
 
             case _:
                 print("CURRENT STATE: ERROR")
-                if not errorCatch(f'{PLAYBACK_COMMAND}ErrorSound.wav', "Audio playback"):
+                if not errorCatch(f'{PLAYBACK_COMMAND}ErrorAudio.wav', "Audio playback"):
                     state = States.ERROR
                     continue
                 state = States.WAKE_WORD
