@@ -34,7 +34,28 @@ def accessSecretVersion(projectID, secretID, versionID) -> secretmanager.AccessS
     payload = response.payload.data.decode("UTF-8")
     return payload
 
-def convertToAudio(textResponse):
+def convertAudioToText(audioFile):
+    speechClient = speech.SpeechClient()
+    config = speech.RecognitionConfig(
+        sample_rate_hertz=48000,
+        language_code="en-US",
+        model="latest_short",
+        audio_channel_count=2,
+    )
+    audio = speech.RecognitionAudio(content=audioFile.read())
+    
+    operation = speechClient.long_running_recognize(config=config, audio=audio)
+
+    print("Transcribing audio input...")
+    response = operation.result(timeout=90)
+
+    for i, result in enumerate(response.results):
+        alternative = result.alternatives[0]
+        print(f"Transcript: {alternative.transcript}")
+        prompt = alternative.transcript
+    return prompt
+
+def convertTextToAudio(textResponse):
     api_token = accessSecretVersion("848154742223", "TextToSpeechAPIKey", "1")
     Resemble.api_key(api_token)
 
@@ -52,39 +73,11 @@ def convertToAudio(textResponse):
     )
     return response['item']['audio_src']
 
-@app.route("/prompt", methods=["POST"])
-def Prompt():
-    prompt = ""
-    if "prompt" not in request.files:
-        return jsonify({"error": "No audio file sent"}), 400
-    audioFile = request.files["prompt"]
-    if audioFile == "":
-        return jsonify({"error": "No audio file sent"}), 400
-    
-    speechClient = speech.SpeechClient()
-    config = speech.RecognitionConfig(
-        sample_rate_hertz=48000,
-        language_code="en-US",
-        model="latest_short",
-        audio_channel_count=2,
-    )
-    audio = speech.RecognitionAudio(content=audioFile.read())
-    
-    operation = speechClient.long_running_recognize(config=config, audio=audio)
-    print("Transcribing audio input...")
-    response = operation.result(timeout=90)
-
-    for i, result in enumerate(response.results):
-        alternative = result.alternatives[0]
-        print("-" * 20)
-        print(f"First alternative of result {i}")
-        print(f"Transcript: {alternative.transcript}")
-        prompt = alternative.transcript
-
+def answerPrompt(prompt):
     question = f"Please answer the following prompt in less than five sentences, and with only alpha-numeric characters and periods: {prompt}."
     print(f"Question: {question}")
+    
     client = genai.Client(vertexai=True, project="berkheiser-cis693", location="us-central1")
-
     response = client.models.generate_content(
         model="gemini-2.0-flash-001",
         contents=question,
@@ -96,23 +89,12 @@ def Prompt():
     )
 
     print(f"Response: {response.text}")
+    return response
 
-    audioURL = convertToAudio(response.text)
-    return jsonify({"textResponse": response.text, "audioResponse": audioURL})
-
-@app.route("/photo", methods=["POST"])
-def Photo():
-    if "rawData" not in request.files:
-        return jsonify({"error": "No image file sent"}), 400
-    imageBytes = request.files["rawData"].read()
-    if imageBytes == "":
-        return jsonify({"error": "No image file sent"}), 400
-    
-    print(f"Image bytes: {imageBytes}")
+def describeImage(imageBytes):
     question = f"Describe the following image in less than five sentences, and with only alpha-numeric characters and periods."
-    print(f"Question: {question}")
-    client = genai.Client(vertexai=True, project="berkheiser-cis693", location="us-central1")
 
+    client = genai.Client(vertexai=True, project="berkheiser-cis693", location="us-central1")
     response = client.models.generate_content(
         model="gemini-2.0-flash-001",
         contents=[
@@ -130,7 +112,34 @@ def Photo():
     )
 
     print(f"Response: {response.text}")
-    audioURL = convertToAudio(response.text)
+    return response
+
+
+@app.route("/prompt", methods=["POST"])
+def Prompt():
+    prompt = ""
+    if "prompt" not in request.files:
+        return jsonify({"error": "No audio file sent"}), 400
+    audioFile = request.files["prompt"]
+    if audioFile == "":
+        return jsonify({"error": "No audio file sent"}), 400
+
+    response = answerPrompt(convertAudioToText(audioFile))
+
+    audioURL = convertTextToAudio(response.text)
+    return jsonify({"textResponse": response.text, "audioResponse": audioURL})
+
+@app.route("/photo", methods=["POST"])
+def Photo():
+    if "rawData" not in request.files:
+        return jsonify({"error": "No image file sent"}), 400
+    imageBytes = request.files["rawData"].read()
+    if imageBytes == "":
+        return jsonify({"error": "No image file sent"}), 400
+    
+    response = describeImage(imageBytes)
+    
+    audioURL = convertTextToAudio(response.text)
     return jsonify({"textResponse": response.text, "audioResponse": audioURL})
 
 

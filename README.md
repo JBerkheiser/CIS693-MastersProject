@@ -11,10 +11,7 @@ The fronted software was written in Python, and was developed to be readable and
 
 ## Lessons Learned
 
+
 ## Optimizations to be made
-- Finish encasing
-- Run program on startup
-- Complete README
-- Complete final paper
 - Refactor backend
 - Can it be done faster? (No cold starts, could save ~15 secs)
